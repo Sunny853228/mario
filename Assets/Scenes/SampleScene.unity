@@ -19731,7 +19731,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 0.2
-  jumpFoerce: 6
+  jumpFoerce: 10
   isGrounded: 1
   animator: {fileID: 385650139}
   score: 0
