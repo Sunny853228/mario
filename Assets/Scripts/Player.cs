@@ -25,7 +25,7 @@ public class Player : MonoBehaviour
 
     public void Start()
     {
-        scoreText.text = "����:" + score.ToString();
+        scoreText.text = "Score:" + score.ToString();
         rigidbody2d = GetComponent<Rigidbody2D>();
         spriteRenderer = MarioSprite.GetComponent<SpriteRenderer>();
         //animator = GetComponent<Animator>();
@@ -92,7 +92,7 @@ public class Player : MonoBehaviour
     public void AddCoin(int count)
     {
         score += count;
-        scoreText.text = "����:" + score.ToString();
+        scoreText.text = "Score:" + score.ToString();
         PlayerPrefs.SetInt("Score", score);
         if (PlayerPrefs.GetInt("MaxScore") < score)
         {
