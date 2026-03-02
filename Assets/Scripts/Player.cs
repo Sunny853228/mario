@@ -137,6 +137,11 @@ public class Player : MonoBehaviour
             AddCoin(1);
             Destroy(collision.gameObject);
         }
+
+        else if (collision.gameObject.tag == "DeathZone")
+        {
+            Respawn();
+        }
     }
     private void OnTriggerStay2D(Collider2D collision)
     {
