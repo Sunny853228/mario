@@ -19409,7 +19409,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 7.620093
+  orthographic size: 10.589051
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -19434,11 +19434,11 @@ Transform:
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -5.8, y: 5.4, z: -10}
+  m_LocalPosition: {x: 3.94, y: 2.28, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1536757981}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1126958042
 GameObject:
@@ -19512,6 +19512,37 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 19.493, y: -2.5, z: 0.038049325}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1180506995
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1180506996}
+  m_Layer: 0
+  m_Name: SpawnPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1180506996
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1180506995}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.46, y: 0, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -19653,7 +19684,6 @@ Transform:
   m_Children:
   - {fileID: 385650138}
   - {fileID: 85649287}
-  - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &1536757982
@@ -19739,6 +19769,7 @@ MonoBehaviour:
   PressS: {fileID: 85649284}
   MarioSprite: {fileID: 385650136}
   CanMove: 0
+  spawnPoint: {fileID: 1180506996}
 --- !u!1 &1704576816
 GameObject:
   m_ObjectHideFlags: 0
@@ -19879,6 +19910,8 @@ SceneRoots:
   m_Roots:
   - {fileID: 96697999}
   - {fileID: 442556989}
+  - {fileID: 519420032}
   - {fileID: 1536757981}
   - {fileID: 1271598284}
   - {fileID: 1126958044}
+  - {fileID: 1180506996}

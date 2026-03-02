@@ -23,6 +23,8 @@ public class Player : MonoBehaviour
     public GameObject MarioSprite;
     public int CanMove;
 
+    public Transform spawnPoint;
+
     public void Start()
     {
         scoreText.text = "Score:" + score.ToString();
@@ -76,6 +78,11 @@ public class Player : MonoBehaviour
         {
             SceneManager.LoadScene(0);
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Respawn();
+        }
     }
 
     private void Jump()
@@ -86,6 +93,20 @@ public class Player : MonoBehaviour
             //rigidbody2d.AddForce(transform.up * jumpFoerce, ForceMode2D.Impulse);
             rigidbody2d.velocity = transform.up * jumpFoerce;
             animator.SetInteger("Idle", 2);
+        }
+    }
+
+    private void Respawn()
+    {
+        if (spawnPoint != null)
+        {
+            transform.position = spawnPoint.position;
+            rigidbody2d.velocity = Vector2.zero;
+            animator.SetInteger("Idle", 0);
+        }
+        else
+        {
+            Debug.LogWarning("Точка спавна не назначена!");
         }
     }
 
