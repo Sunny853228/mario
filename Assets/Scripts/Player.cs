@@ -151,10 +151,19 @@ public class Player : MonoBehaviour
 
             if (Input.GetKey(KeyCode.S))
             {
-                CanMove = 0;
-                transform.position = collision.transform.position;
-                animator.SetInteger("Idle", 3);
-                NextRandomMap();
+                Teleport teleport = collision.GetComponent<Teleport>();
+                if (teleport != null)
+                {
+                    teleport.TeleportPlayer();
+                }
+                else
+                {
+                    Debug.LogError("На объекте телепорта нет скрипта Teleport!");
+                }
+                //CanMove = 0;
+                //transform.position = collision.transform.position;
+                //animator.SetInteger("Idle", 3);
+                //NextRandomMap();
             }
         }
     }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - Teleport
+  - DeathZone
   layers:
   - Default
   - TransparentFX
