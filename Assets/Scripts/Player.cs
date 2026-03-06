@@ -19,7 +19,7 @@ public class Player : MonoBehaviour
 
     public int score;
     public TextMeshProUGUI scoreText;
-    public GameObject PressS;
+    //public GameObject PressS;
     public GameObject MarioSprite;
     public int CanMove;
 
@@ -143,37 +143,37 @@ public class Player : MonoBehaviour
             Respawn();
         }
     }
-    private void OnTriggerStay2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "Teleport")
-        {
-            PressS.SetActive(true);
+    //private void OnTriggerStay2D(Collider2D collision)
+    //{
+    //    if (collision.gameObject.tag == "Teleport")
+    //    {
+    //        PressS.SetActive(true);
 
-            if (Input.GetKey(KeyCode.S))
-            {
-                Teleport teleport = collision.GetComponent<Teleport>();
-                if (teleport != null)
-                {
-                    teleport.TeleportPlayer();
-                }
-                else
-                {
-                    Debug.LogError("На объекте телепорта нет скрипта Teleport!");
-                }
-                //CanMove = 0;
-                //transform.position = collision.transform.position;
-                //animator.SetInteger("Idle", 3);
-                //NextRandomMap();
-            }
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.tag == "Teleport")
-        {
-            PressS.SetActive(false);
-        }
-    }
+            //if (Input.GetKey(KeyCode.S))
+            //{
+            //    Teleport teleport = collision.GetComponent<Teleport>();
+            //    if (teleport != null)
+            //    {
+            //        teleport.TeleportPlayer();
+            //    }
+            //    else
+            //    {
+            //        Debug.LogError("На объекте телепорта нет скрипта Teleport!");
+            //    }
+            //    CanMove = 0;
+            //    transform.position = collision.transform.position;
+            //    animator.SetInteger("Idle", 3);
+            //    NextRandomMap();
+    //        }
+    //    }
+    //}
+    //private void OnTriggerExit2D(Collider2D collision)
+    //{
+    //    if (collision.gameObject.tag == "Teleport")
+    //    {
+    //        PressS.SetActive(false);
+    //   }
+    //}
     private void OnCollisionExit2D(Collision2D collision)
     {
         if (collision.gameObject.tag == "Ground")
