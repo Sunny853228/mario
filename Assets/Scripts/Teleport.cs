@@ -1,43 +1,52 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Teleport : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject choicePanel;          // панель с кнопками
+    public GameObject choicePanel;          // панель с кнопками выбора уровня
     public Button prevButton;               // кнопка "Предыдущий уровень"
-    public Button currentButton;             // кнопка "Этот уровень"
-    public Button nextButton;                // кнопка "Следующий уровень"
-    public TextMeshProUGUI prevText;         // текст на кнопке "Предыдущий"
-    public TextMeshProUGUI currentText;       // текст на кнопке "Текущий"
-    public TextMeshProUGUI nextText;          // текст на кнопке "Следующий"
+    public Button currentButton;            // кнопка "Текущий уровень"
+    public Button nextButton;               // кнопка "Следующий уровень"
+    public TextMeshProUGUI prevText;        // текст на кнопке "Предыдущий"
+    public TextMeshProUGUI currentText;      // текст на кнопке "Текущий"
+    public TextMeshProUGUI nextText;         // текст на кнопке "Следующий"
 
-    private int currentSceneIndex;
-    private int totalScenesInBuild;
+    [Header("Levels")]
+    public GameObject[] levels;              // массив объектов уровней (порядок важен!)
+    public Transform[] spawnPoints;          // массив точек спавна для каждого уровня (соответствует порядку уровней)
+
+    private int currentLevelIndex;           // индекс текущего активного уровня
 
     void Start()
     {
+        // Скрываем панель при старте
         if (choicePanel != null)
             choicePanel.SetActive(false);
 
-        currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-        totalScenesInBuild = SceneManager.sceneCountInBuildSettings;
+        // Определяем, какой уровень сейчас активен (ищем включённый)
+        for (int i = 0; i < levels.Length; i++)
+        {
+            if (levels[i].activeSelf)
+            {
+                currentLevelIndex = i;
+                break;
+            }
+        }
     }
 
+    // При входе игрока в зону телепорта
     private void OnTriggerEnter2D(Collider2D other)
     {
-        //.Log("Trigger");
         if (other.CompareTag("Player"))
         {
             ShowChoicePanel();
         }
     }
 
+    // При выходе игрока из зоны телепорта
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
@@ -46,59 +55,120 @@ public class Teleport : MonoBehaviour
         }
     }
 
+    // Показать панель выбора и настроить кнопки
     void ShowChoicePanel()
     {
-        //Debug.Log($"Текущий индекс: {SceneManager.GetActiveScene().buildIndex}, Всего сцен: {SceneManager.sceneCountInBuildSettings}");
-
         if (choicePanel == null) return;
 
-        int totalScenes = SceneManager.sceneCountInBuildSettings;
-        int currentIndex = SceneManager.GetActiveScene().buildIndex;
-
-        // Настройка левой кнопки (предыдущий / главное меню)
-        if (currentIndex > 1) // есть предыдущий уровень (не главное меню)
+        // --- Левая кнопка (предыдущий уровень или главное меню) ---
+        if (currentLevelIndex > 0) // если есть предыдущий уровень
         {
-            prevText.text = "Предыдущий";
+            prevText.text = "Предыдущий уровень";
             prevButton.onClick.RemoveAllListeners();
-            prevButton.onClick.AddListener(() => LoadSceneByIndex(currentIndex - 1));
+            prevButton.onClick.AddListener(() => SwitchLevel(currentLevelIndex - 1));
         }
-        else // первый уровень или главное меню
+        else // если это первый уровень
         {
             prevText.text = "Главное меню";
             prevButton.onClick.RemoveAllListeners();
-            prevButton.onClick.AddListener(() => LoadSceneByIndex(0));
+            prevButton.onClick.AddListener(() => LoadMainMenu());
         }
 
-        // Центральная кнопка (текущий уровень)
+        // --- Центральная кнопка (текущий уровень) ---
         currentText.text = "Этот уровень";
         currentButton.onClick.RemoveAllListeners();
-        currentButton.onClick.AddListener(() => LoadSceneByIndex(currentIndex));
+        currentButton.onClick.AddListener(() => SwitchLevel(currentLevelIndex));
 
-        // Настройка правой кнопки (следующий / главное меню)
-        if (currentIndex < totalScenes - 1) // есть следующий уровень
+        // --- Правая кнопка (следующий уровень или главное меню) ---
+        if (currentLevelIndex < levels.Length - 1) // если есть следующий уровень
         {
-            nextText.text = "Следующий";
+            nextText.text = "Следующий уровень";
             nextButton.onClick.RemoveAllListeners();
-            nextButton.onClick.AddListener(() => LoadSceneByIndex(currentIndex + 1));
+            nextButton.onClick.AddListener(() => SwitchLevel(currentLevelIndex + 1));
         }
-        else // последний уровень (или главное меню, если оно последнее)
+        else // если это последний уровень
         {
             nextText.text = "Главное меню";
             nextButton.onClick.RemoveAllListeners();
-            nextButton.onClick.AddListener(() => LoadSceneByIndex(0));
+            nextButton.onClick.AddListener(() => LoadMainMenu());
         }
 
+        // Активируем панель
         choicePanel.SetActive(true);
     }
 
+    // Переключение на уровень с указанным индексом
+    void SwitchLevel(int index)
+    {
+        if (index < 0 || index >= levels.Length)
+        {
+            Debug.LogError($"SwitchLevel: индекс {index} вне диапазона (0-{levels.Length - 1})");
+            return;
+        }
+
+        // Отладочный вывод
+        Debug.Log($"SwitchLevel вызван с индексом {index}");
+
+        // Выключаем все уровни
+        foreach (GameObject level in levels)
+        {
+            if (level != null)
+                level.SetActive(false);
+        }
+
+        // Включаем нужный уровень
+        levels[index].SetActive(true);
+        currentLevelIndex = index;
+
+        // Перемещаем игрока в точку спавна этого уровня
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            Debug.LogError("Player not found! Проверьте тег Player.");
+            HideChoicePanel();
+            return;
+        }
+
+        if (spawnPoints[index] == null)
+        {
+            Debug.LogError($"Spawn point для уровня {index} не назначен!");
+            HideChoicePanel();
+            return;
+        }
+
+        // Устанавливаем позицию через Rigidbody2D, если есть, иначе через transform
+        Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.position = spawnPoints[index].position;
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
+        else
+        {
+            player.transform.position = spawnPoints[index].position;
+        }
+
+        // Синхронизируем физику, чтобы коллайдеры обновились
+        Physics2D.SyncTransforms();
+
+        Debug.Log($"Player position set to: {player.transform.position}");
+
+        // Скрываем панель
+        HideChoicePanel();
+    }
+
+    // Загрузка главного меню (если оно в отдельной сцене)
+    void LoadMainMenu()
+    {
+        Debug.Log("Загрузка главного меню");
+        SceneManager.LoadScene("MainMenu"); // Убедитесь, что сцена называется именно так
+    }
+
+    // Скрыть панель выбора
     void HideChoicePanel()
     {
         if (choicePanel != null)
             choicePanel.SetActive(false);
-    }
-
-    void LoadSceneByIndex(int index)
-    {
-        SceneManager.LoadScene(index);
     }
 }
