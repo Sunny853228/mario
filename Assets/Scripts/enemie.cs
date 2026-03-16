@@ -3,42 +3,52 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [Header("Movement")]
-    [SerializeField] private float _speed = 2f;               // скорость движения
-    [SerializeField] private LayerMask _groundLayer;          // слой земли
-    [SerializeField] private LayerMask _playerLayer;          // слой игрока
+    [SerializeField] private float speed = 2f;
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private LayerMask playerLayer;
 
     [Header("Edge Detection")]
-    [SerializeField] private float _edgeCheckDistance = 1f;   // длина луча для проверки края
-    [SerializeField] private Vector2 _groundCheckOffset = new Vector2(0.5f, -0.5f); // смещение точки луча от центра (x – вперёд, y – вниз)
+    [SerializeField] private float edgeCheckDistance = 1f;
+    [SerializeField] private Vector2 groundCheckOffset = new Vector2(0.5f, -0.5f);
 
-    private Rigidbody2D _rigidBody;
-    private SpriteRenderer _spriteRenderer;
-    private int _direction = 1; // 1 – вправо, -1 – влево
+    private Rigidbody2D rigidBody;
+    private SpriteRenderer spriteRenderer;
+    private int direction = 1; // 1 – вправо, -1 – влево
 
     void Awake()
     {
-        _rigidBody = GetComponent<Rigidbody2D>();
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        rigidBody = GetComponent<Rigidbody2D>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void Start()
     {
-        // Определяем начальное направление по спрайту (если спрайт развёрнут, то идём влево)
-        if (_spriteRenderer.flipX)
-            _direction = -1;
+        if (spriteRenderer.flipX)
+            direction = -1;
     }
 
     void FixedUpdate()
     {
-        // Горизонтальное движение с постоянной скоростью (вертикальная скорость сохраняется от гравитации)
-        _rigidBody.velocity = new Vector2(_speed * _direction, _rigidBody.velocity.y);
+        rigidBody.velocity = new Vector2(speed * direction, rigidBody.velocity.y);
 
-        // Проверка края (отсутствие земли впереди-снизу)
-        Vector2 rayOrigin = (Vector2)transform.position + new Vector2(_direction * _groundCheckOffset.x, _groundCheckOffset.y);
-        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, _edgeCheckDistance, _groundLayer);
-        Debug.DrawRay(rayOrigin, Vector2.down * _edgeCheckDistance, hit.collider == null ? Color.red : Color.green);
+        // Проверка края
+        Vector2 rayOrigin = (Vector2)transform.position + new Vector2(direction * groundCheckOffset.x, groundCheckOffset.y);
+        RaycastHit2D hit = Physics2D.Raycast(rayOrigin, Vector2.down, edgeCheckDistance, groundLayer);
+        Debug.DrawRay(rayOrigin, Vector2.down * edgeCheckDistance, hit.collider == null ? Color.red : Color.green);
 
         if (hit.collider == null) // впереди обрыв
+        {
+            FlipDirection();
+            return;
+        }
+
+        // Проверка стены впереди
+        Vector2 forwardRayOrigin = (Vector2)transform.position + new Vector2(direction * 0.5f, 0);
+        float rayLength = 0.1f;
+        RaycastHit2D wallHit = Physics2D.Raycast(forwardRayOrigin, Vector2.right * direction, rayLength, groundLayer);
+        Debug.DrawRay(forwardRayOrigin, Vector2.right * direction * rayLength, wallHit.collider != null ? Color.red : Color.green);
+
+        if (wallHit.collider != null)
         {
             FlipDirection();
         }
@@ -47,13 +57,11 @@ public class Enemy : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision)
     {
         // Столкновение со стеной (земля)
-        if (((1 << collision.gameObject.layer) & _groundLayer) != 0)
+        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                // contact.normal направлен от врага к объекту, с которым столкнулись
-                // Проверяем, направлена ли нормаль примерно противоположно движению
-                float dot = Vector2.Dot(contact.normal, Vector2.right * _direction);
+                float dot = Vector2.Dot(contact.normal, Vector2.right * direction);
                 if (dot < -0.7f) // встречная стена
                 {
                     FlipDirection();
@@ -63,29 +71,29 @@ public class Enemy : MonoBehaviour
         }
 
         // Столкновение с игроком
-        if (((1 << collision.gameObject.layer) & _playerLayer) != 0)
+        if (((1 << collision.gameObject.layer) & playerLayer) != 0)
         {
             foreach (ContactPoint2D contact in collision.contacts)
             {
-                // Если игрок сверху (нормаль от врага к игроку направлена вверх)
-                if (contact.normal.y > 0.7f)
+                Debug.Log($"Нормаль: {contact.normal}, y = {contact.normal.y}");
+                Debug.DrawLine(contact.point, contact.point + contact.normal * 2, Color.magenta, 2f); // рисуем нормаль
+                if (contact.normal.y < 0.7f) // игрок сверху
                 {
-                    // Враг умирает
                     Destroy(gameObject);
                     return;
                 }
             }
-            // Иначе игрок получает урон – перезагрузка уровня
+            // Иначе – игрок получает урон
             if (RespawnManager.Instance != null)
                 RespawnManager.Instance.Respawn();
             else
-                Debug.LogError("RespawnManager не найден! Добавьте объект RespawnManager на сцену.");
+                Debug.LogError("RespawnManager не найден!");
         }
     }
 
     void FlipDirection()
     {
-        _direction *= -1;
-        _spriteRenderer.flipX = !_spriteRenderer.flipX; // разворачиваем спрайт
+        direction *= -1;
+        spriteRenderer.flipX = !spriteRenderer.flipX;
     }
 }

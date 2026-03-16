@@ -45,15 +45,18 @@ public class Player : MonoBehaviour
         {
             bool grounded = normals != null ? normals.IsGroundedByNormals : false;
 
+            //прыжок
             if (Input.GetKey(KeyCode.Space) && grounded)
             {
                 Jump();
             }
 
+            //движение
             Vector3 position = transform.position;
             position.x += Input.GetAxis("Horizontal") * speed;
             transform.position = position;
 
+            //поворот и анимация бега
             if (Input.GetAxis("Horizontal") != 0)
             {
                 if (Input.GetAxis("Horizontal") < 0)
