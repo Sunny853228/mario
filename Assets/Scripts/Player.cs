@@ -14,8 +14,8 @@ public class Player : MonoBehaviour
     private SpriteRenderer spriteRenderer;
     public Animator animator;
 
-    public int score;
-    public TextMeshProUGUI scoreText;
+    public int score; // текущий счёт
+    public TextMeshProUGUI scoreText; // UI для отображения счёта
     public GameObject MarioSprite;
     public int CanMove;
 
@@ -25,11 +25,13 @@ public class Player : MonoBehaviour
 
     public void Start()
     {
+        // Начинаем с нуля при каждом запуске уровня
+        score = 0;
         scoreText.text = "Score:" + score.ToString();
+
         rigidbody2d = GetComponent<Rigidbody2D>();
         spriteRenderer = MarioSprite.GetComponent<SpriteRenderer>();
-        // animator = GetComponent<Animator>(); // раскомментируйте, если аниматор не назначен в инспекторе
-        score = PlayerPrefs.GetInt("Score");
+        // animator = GetComponent<Animator>(); // раскомм, если аниматор не назначен в инспекторе
         CanMove = 1;
 
         normals = GetComponent<Normals>();
@@ -45,32 +47,25 @@ public class Player : MonoBehaviour
         {
             bool grounded = normals != null ? normals.IsGroundedByNormals : false;
 
-            //прыжок
+            // Прыжок
             if (Input.GetKey(KeyCode.Space) && grounded)
-            {
                 Jump();
-            }
 
-            //движение
+            // Движение
             Vector3 position = transform.position;
             position.x += Input.GetAxis("Horizontal") * speed;
             transform.position = position;
 
-            //поворот и анимация бега
-            if (Input.GetAxis("Horizontal") != 0)
+            // Поворот спрайта и анимация бега/покоя
+            float move = Input.GetAxis("Horizontal");
+            if (move != 0)
             {
-                if (Input.GetAxis("Horizontal") < 0)
-                    spriteRenderer.flipX = true;
-                else if (Input.GetAxis("Horizontal") > 0)
-                    spriteRenderer.flipX = false;
-
-                if (grounded)
-                    animator.SetInteger("Idle", 1);
+                spriteRenderer.flipX = move < 0;
+                if (grounded) animator.SetInteger("Idle", 1);
             }
             else
             {
-                if (grounded)
-                    animator.SetInteger("Idle", 0);
+                if (grounded) animator.SetInteger("Idle", 0);
             }
         }
     }
@@ -108,7 +103,8 @@ public class Player : MonoBehaviour
     {
         score += count;
         scoreText.text = "Score:" + score.ToString();
-        PlayerPrefs.SetInt("Score", score);
+
+        // Сохраняем только рекорд (максимальный достигнутый счёт)
         if (PlayerPrefs.GetInt("MaxScore") < score)
             PlayerPrefs.SetInt("MaxScore", score);
     }

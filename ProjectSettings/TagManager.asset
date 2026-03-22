@@ -7,6 +7,9 @@ TagManager:
   - Ground
   - Teleport
   - DeathZone
+  - Enemy
+  - Coin
+  - Brick
   layers:
   - Default
   - TransparentFX

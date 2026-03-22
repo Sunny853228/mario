@@ -11,6 +11,9 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float edgeCheckDistance = 1f;
     [SerializeField] private Vector2 groundCheckOffset = new Vector2(0.5f, -0.5f);
 
+    [Header("Points")]
+    [SerializeField] private int points = 10; // очки за уничтожение врага
+
     private Rigidbody2D rigidBody;
     private SpriteRenderer spriteRenderer;
     private int direction = 1; // 1 – вправо, -1 – влево
@@ -76,9 +79,13 @@ public class Enemy : MonoBehaviour
             foreach (ContactPoint2D contact in collision.contacts)
             {
                 Debug.Log($"Нормаль: {contact.normal}, y = {contact.normal.y}");
-                Debug.DrawLine(contact.point, contact.point + contact.normal * 2, Color.magenta, 2f); // рисуем нормаль
-                if (contact.normal.y < 0.7f) // игрок сверху
+                Debug.DrawLine(contact.point, contact.point + contact.normal * 2, Color.magenta, 2f);
+                if (contact.normal.y < -0.8f) // игрок сверху
                 {
+                    // Начисляем очки игроку
+                    Player player = collision.gameObject.GetComponent<Player>();
+                    if (player != null)
+                        player.AddCoin(points);
                     Destroy(gameObject);
                     return;
                 }
