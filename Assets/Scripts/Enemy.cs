@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : MonoBehaviour, IActivable
 {
     [Header("Movement")]
     [SerializeField] private float speed = 2f;
@@ -102,5 +102,15 @@ public class Enemy : MonoBehaviour
     {
         direction *= -1;
         spriteRenderer.flipX = !spriteRenderer.flipX;
+    }
+
+    public void Activate()
+    {
+        enabled = true;
+    }
+
+    public void Deactivate()
+    {
+        enabled = false;
     }
 }
